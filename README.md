@@ -32,10 +32,7 @@ ParkEase is a full-stack web application built to make urban parking smarter and
 | **Backend**   | Node.js, Express.js         |
 | **Database**  | MongoDB / Supabase (flexible)|
 | **Authentication** | JWT / Auth0             |
-| **Maps API**  | Google Maps API             |
-| **Payments**  | Stripe / Razorpay           |
-| **Deployment**| Netlify (Frontend), Render / Heroku (Backend) |
-
+| **Maps API**  | Google Maps API             |       |
 ---
 
 ## 📂 Folder Structure (Example)
