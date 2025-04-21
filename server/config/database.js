@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    // MongoDB Atlas connection string (replace with your actual connection string)
-    const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://<username>:<password>@cluster0.mongodb.net/parkease?retryWrites=true&w=majority';
-    
+    // Use local MongoDB connection string
+    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/parkease';
+
     const conn = await mongoose.connect(mongoURI, {
       useNewUrlParser: true,
-      useUnifiedTopology: true
+      useUnifiedTopology: true,
     });
 
     console.log(`MongoDB Connected: ${conn.connection.host}`);
