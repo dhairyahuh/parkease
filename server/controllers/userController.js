@@ -23,8 +23,11 @@ exports.register = async (req, res) => {
     res.status(201).json({
       status: 'success',
       token,
-      data: {
-        user: newUser
+      user: {
+        _id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role
       }
     });
   } catch (err) {
@@ -61,7 +64,13 @@ exports.login = async (req, res) => {
     const token = signToken(user._id);
     res.status(200).json({
       status: 'success',
-      token
+      token,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
     });
   } catch (err) {
     res.status(400).json({

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import {
   AppBar,
@@ -16,14 +16,53 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import LocalParkingIcon from '@mui/icons-material/LocalParking';
 
+// Create auth context
+export const AuthContext = createContext();
+
+// Auth Provider component
+export const AuthProvider = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userRole, setUserRole] = useState(null);
+
+  useEffect(() => {
+    // Check if user is authenticated
+    const token = localStorage.getItem('token');
+    setIsAuthenticated(!!token);
+    
+    // TODO: In a real app, decode the token to get user role
+    // For now, we'll just set a default role if authenticated
+    if (token) {
+      setUserRole('user');
+    }
+  }, []);
+
+  const login = (token, role = 'user') => {
+    localStorage.setItem('token', token);
+    setIsAuthenticated(true);
+    setUserRole(role);
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    setIsAuthenticated(false);
+    setUserRole(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{ isAuthenticated, userRole, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+// Custom hook to use auth context
+export const useAuth = () => useContext(AuthContext);
+
 const Navbar = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const navigate = useNavigate();
-
-  // TODO: Replace with actual auth state management
-  const isAuthenticated = false;
-  const userRole = null;
+  const { isAuthenticated, userRole, logout } = useAuth();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -41,7 +80,7 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
-    // TODO: Implement logout logic
+    logout();
     handleCloseUserMenu();
     navigate('/');
   };

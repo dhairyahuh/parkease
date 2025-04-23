@@ -3,7 +3,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
 // Layout components
-import Navbar from './components/layout/Navbar';
+import Navbar, { AuthProvider } from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 
 // Views
@@ -33,9 +33,10 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
-        <div className="app">
-          <Navbar />
-          <main>
+        <AuthProvider>
+          <div className="app">
+            <Navbar />
+            <main>
             <Routes>
               {/* Public routes */}
               <Route path="/" element={<GuestHome />} />
@@ -47,9 +48,10 @@ function App() {
               <Route path="/operator" element={<OperatorDashboard />} />
               <Route path="/residential" element={<ResidentialDashboard />} />
             </Routes>
-          </main>
-          <Footer />
-        </div>
+            </main>
+            <Footer />
+          </div>
+        </AuthProvider>
       </Router>
     </ThemeProvider>
   );

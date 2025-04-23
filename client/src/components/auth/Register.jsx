@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../layout/Navbar';
 import {
   Box,
   Container,
@@ -9,10 +10,14 @@ import {
   Paper,
   Alert,
   MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 
 const Register = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -39,9 +44,14 @@ const Register = () => {
       setError('Passwords do not match');
       return;
     }
+    
+    if (!['user', 'operator', 'residential'].includes(formData.role)) {
+      setError('Please select a valid role');
+      return;
+    }
 
     try {
-      const response = await fetch('/api/users/register', {
+      const response = await fetch('http://localhost:5002/api/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -54,14 +64,19 @@ const Register = () => {
         }),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (err) {
+        throw new Error('Invalid server response');
+      }
 
       if (!response.ok) {
         throw new Error(data.message || 'Registration failed');
       }
 
-      // Store token in localStorage
-      localStorage.setItem('token', data.token);
+      // Use auth context to login
+      login(data.token, data.user.role);
       
       // Redirect based on user role
       switch (data.user.role) {
@@ -100,84 +115,73 @@ const Register = () => {
           }}
         >
           <Typography component="h1" variant="h5">
-            Sign up
+            Register
           </Typography>
-          {error && (
-            <Alert severity="error" sx={{ mt: 2, width: '100%' }}>
-              {error}
-            </Alert>
-          )}
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
+          {error && <Alert severity="error" sx={{ width: '100%', mt: 2 }}>{error}</Alert>}
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3, width: '100%' }}>
             <TextField
-              margin="normal"
               required
               fullWidth
-              id="name"
+              margin="normal"
               label="Full Name"
               name="name"
-              autoComplete="name"
-              autoFocus
               value={formData.name}
               onChange={handleChange}
             />
             <TextField
-              margin="normal"
               required
               fullWidth
-              id="email"
+              margin="normal"
               label="Email Address"
               name="email"
-              autoComplete="email"
+              type="email"
               value={formData.email}
               onChange={handleChange}
             />
             <TextField
-              margin="normal"
               required
               fullWidth
-              name="password"
+              margin="normal"
               label="Password"
+              name="password"
               type="password"
-              id="password"
-              autoComplete="new-password"
               value={formData.password}
               onChange={handleChange}
             />
             <TextField
-              margin="normal"
               required
               fullWidth
-              name="confirmPassword"
+              margin="normal"
               label="Confirm Password"
+              name="confirmPassword"
               type="password"
-              id="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
             />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              select
-              name="role"
-              label="Role"
-              id="role"
-              value={formData.role}
-              onChange={handleChange}
-            >
-              <MenuItem value="user">User</MenuItem>
-              <MenuItem value="operator">Operator</MenuItem>
-              <MenuItem value="residential">Residential</MenuItem>
-            </TextField>
+            <FormControl fullWidth margin="normal">
+              <InputLabel>Role</InputLabel>
+              <Select
+                label="Role"
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                required
+              >
+                <MenuItem value="user">User</MenuItem>
+                <MenuItem value="operator">Operator</MenuItem>
+                <MenuItem value="residential">Residential</MenuItem>
+              </Select>
+            </FormControl>
             <Button
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign Up
+              Register
             </Button>
           </Box>
+
         </Paper>
       </Box>
     </Container>

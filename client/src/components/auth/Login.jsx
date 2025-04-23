@@ -9,9 +9,11 @@ import {
   Paper,
   Alert,
 } from '@mui/material';
+import { useAuth } from '../layout/Navbar';
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -31,7 +33,7 @@ const Login = () => {
     setError('');
 
     try {
-      const response = await fetch('/api/users/login', {
+      const response = await fetch('http://localhost:5002/api/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -39,14 +41,20 @@ const Login = () => {
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
+      // Parse JSON response once
+      let data;
+      try {
+        data = await response.json();
+      } catch (err) {
+        throw new Error('Invalid server response');
+      }
 
       if (!response.ok) {
         throw new Error(data.message || 'Login failed');
       }
-
-      // Store token in localStorage
-      localStorage.setItem('token', data.token);
+      
+      // Use auth context to login
+      login(data.token, data.user.role);
       
       // Redirect based on user role
       switch (data.user.role) {
