@@ -1,14 +1,12 @@
 const mongoose = require('mongoose');
+const config = require('./config');
 
 const connectDB = async () => {
   try {
-    // Use local MongoDB connection string
-    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/parkease';
+    // Use database configuration from config file
+    const { uri, options } = config.database;
 
-    const conn = await mongoose.connect(mongoURI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    const conn = await mongoose.connect(uri, options);
 
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {

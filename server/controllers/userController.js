@@ -1,10 +1,11 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const config = require('../config/config');
 
 // Generate JWT token
 const signToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET || 'your-secret-key', {
-    expiresIn: process.env.JWT_EXPIRES_IN || '90d'
+  return jwt.sign({ id }, config.auth.jwtSecret, {
+    expiresIn: config.auth.jwtExpiresIn
   });
 };
 
@@ -96,7 +97,7 @@ exports.protect = async (req, res, next) => {
     }
 
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    const decoded = jwt.verify(token, config.auth.jwtSecret);
 
     // Check if user still exists
     const currentUser = await User.findById(decoded.id);
